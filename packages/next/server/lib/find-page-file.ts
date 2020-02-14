@@ -1,6 +1,6 @@
 import { join } from 'path'
 import chalk from 'chalk'
-import { isWriteable } from '../../build/is-writeable'
+import { fileExists } from '../../lib/file-exists'
 import { warn } from '../../build/output/log'
 
 export async function findPageFile(
@@ -14,7 +14,7 @@ export async function findPageFile(
     const relativePagePath = `${normalizedPagePath}.${extension}`
     const pagePath = join(rootDir, relativePagePath)
 
-    if (await isWriteable(pagePath)) {
+    if (await fileExists(pagePath)) {
       foundPagePaths.push(relativePagePath)
     }
 
@@ -23,7 +23,7 @@ export async function findPageFile(
       `index.${extension}`
     )
     const pagePathWithIndex = join(rootDir, relativePagePathWithIndex)
-    if (await isWriteable(pagePathWithIndex)) {
+    if (await fileExists(pagePathWithIndex)) {
       foundPagePaths.push(relativePagePathWithIndex)
     }
   }

@@ -15,6 +15,7 @@ import {
 } from 'next-test-utils'
 import webdriver from 'next-webdriver'
 import cheerio from 'cheerio'
+import fs from 'fs'
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 60 * 2
 
@@ -46,6 +47,20 @@ describe('CSS Support', () => {
       expect(await readFile(join(cssFolder, cssFiles[0]), 'utf8')).toContain(
         'color:red'
       )
+    })
+
+    it('should compile successfully even pages is not writable', async () => {
+      const customAppFile = join(appDir, 'pages', '_app.js')
+      const originalPermission =
+        '0' + (fs.statSync(customAppFile).mode & parseInt('777', 8)).toString(8)
+      const notWritablePermission = 0o555
+      await fs.chmod(customAppFile, notWritablePermission)
+      const { code, stdout } = await nextBuild(appDir, [], {
+        stdout: true,
+      })
+      await fs.chmod(customAppFile, originalPermission)
+      expect(code).toBe(0)
+      expect(stdout).toMatch(/Compiled successfully/)
     })
   })
 
